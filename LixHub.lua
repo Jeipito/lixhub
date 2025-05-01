@@ -8,7 +8,6 @@ return function()
     local Players        = game:GetService("Players")
     local RunService     = game:GetService("RunService")
     local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
     local player = Players.LocalPlayer
 
     -- Criar GUI
@@ -45,7 +44,7 @@ return function()
     toggle.BorderSizePixel = 0
     toggle.Parent = frame
 
-    -- Estado
+    -- Estado de mineração
     local mining = false
     toggle.MouseButton1Click:Connect(function()
         mining = not mining
@@ -64,19 +63,22 @@ return function()
         local char = player.Character
         if not char or not char:FindFirstChild("HumanoidRootPart") then return end
 
-        local rocks = workspace:FindFirstChild("Rocks")
-        local remote = ReplicatedStorage:FindFirstChild("MineEvent")
-        if not rocks or not remote then return end
+        local rocks = workspace:FindFirstChild("Rocks") -- A pasta de rochas
+        local remote = ReplicatedStorage:FindFirstChild("MineEvent") -- Verifica se o RemoteEvent existe
+        if not rocks or not remote then
+            print("Erro: 'Rocks' ou 'MineEvent' não encontrados!")
+            return
+        end
 
         for _, rock in ipairs(rocks:GetChildren()) do
             if rock:IsA("BasePart") then
                 local dist = (rock.Position - char.HumanoidRootPart.Position).Magnitude
                 if dist <= 15 then
-                    -- dispara o RemoteEvent de mineração
+                    -- Dispara o RemoteEvent de mineração
                     pcall(function()
                         remote:FireServer(rock)
                     end)
-                    break
+                    break  -- Faz a mineração apenas em uma rocha por vez
                 end
             end
         end
